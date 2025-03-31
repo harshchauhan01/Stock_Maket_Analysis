@@ -11,13 +11,13 @@ import warnings
 from datetime import datetime, timedelta
 warnings.filterwarnings('ignore')
 
-# Streamlit app title
+
 st.title("Stock Market Comparison Analysis")
 
-# Sidebar for user inputs
+
 st.sidebar.header("User Inputs")
 
-# List of available stocks
+
 available_stocks = [
     'BPCL.NS', 'RELIANCE.NS', 'TATAMOTORS.NS', 'INFY.NS', 'TCS.NS',
     'HDFCBANK.NS', 'SBIN.NS', 'ITC.NS', 'HINDUNILVR.NS', 'ASIANPAINT.NS',
@@ -32,10 +32,10 @@ selected_stocks = st.sidebar.multiselect(
     default=['BPCL.NS', 'RELIANCE.NS', 'TATAMOTORS.NS']
 )
 
-# Today's date (dynamically updated)
+
 today = pd.to_datetime(datetime.now().date())
 
-# Date range selection
+
 start_date = st.sidebar.date_input("Start Date", value=pd.to_datetime('2020-01-01'))
 end_date = st.sidebar.date_input("End Date", value=today)
 
