@@ -36,6 +36,14 @@ start_date = st.sidebar.date_input("Start Date", value=pd.to_datetime('2020-01-0
 end_date = st.sidebar.date_input("End Date", value=today)
 
 test_size = st.sidebar.slider("Test Size (as % of data)", min_value=0.1, max_value=0.5, value=0.2, step=0.05)
+with st.sidebar:
+        st.markdown("---")
+        st.subheader("Developers")
+        
+        st.markdown("""
+        **Harsh Chauhan** (Reg: 12319734)  
+        [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/harshchauhan7534/)
+        """)
 
 colors = {
     'BPCL.NS': ('blue', 'orange'),
@@ -65,7 +73,7 @@ colors = {
     'TECHM.NS': ('deeppink', 'lightcoral')
 }
 
-features = ['Open', 'High', 'Low', 'Volume', 'MA5', 'MA20']  # Added moving averages
+features = ['Open', 'High', 'Low', 'Volume', 'MA5', 'MA20']
 
 def get_stock_data(ticker, start_date, end_date):
     try:
@@ -74,10 +82,10 @@ def get_stock_data(ticker, start_date, end_date):
             raise ValueError(f"No data found for {ticker} in the specified date range.")
         stock_data.reset_index(inplace=True)
         stock_data['Date'] = pd.to_datetime(stock_data['Date'])
-        # Add moving averages
+        
         stock_data['MA5'] = stock_data['Close'].rolling(window=5).mean()
         stock_data['MA20'] = stock_data['Close'].rolling(window=20).mean()
-        stock_data.dropna(inplace=True)  # Drop rows with NaN values from moving averages
+        stock_data.dropna(inplace=True)
         return stock_data[['Date', 'Open', 'High', 'Low', 'Volume', 'MA5', 'MA20', 'Close']]
     except Exception as e:
         st.error(f"Error downloading data for {ticker}: {str(e)}")
@@ -119,7 +127,6 @@ def run_analysis(selected_stocks, start_date, end_date, test_size):
         if df is None or df.empty:
             continue
         
-        # Last day and today OHLC
         last_day_df = df[df['Date'] < today]
         last_day_row = last_day_df.iloc[-1] if not last_day_df.empty else None
         today_df = df[df['Date'] == today]
@@ -149,15 +156,12 @@ def run_analysis(selected_stocks, start_date, end_date, test_size):
         else:
             st.warning(f"No data available for {stock} on {today.strftime('%Y-%m-%d')} (Today).")
         
-        # Features and target
         X = df[features]
         y = df['Close']
         
-        # Scale features only
         scaler = StandardScaler()
         X_scaled = scaler.fit_transform(X)
         
-        # Split data
         X_train, X_test, y_train, y_test = train_test_split(
             X_scaled, y, test_size=test_size, random_state=42, shuffle=False
         )
@@ -165,15 +169,12 @@ def run_analysis(selected_stocks, start_date, end_date, test_size):
         dates_train = df['Date'][:len(X_train)]
         dates_test = df['Date'][len(X_train):]
         
-        # Train LinearRegression
         model = LinearRegression()
         model.fit(X_train, y_train)
         
-        # Predictions
         y_pred_train = model.predict(X_train)
         y_pred_test = model.predict(X_test)
         
-        # Metrics
         mse = mean_squared_error(y_test, y_pred_test)
         rmse = np.sqrt(mse)
         r2 = r2_score(y_test, y_pred_test)
